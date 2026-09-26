@@ -329,8 +329,7 @@ devices:
       #   0140 -> FADC8000
       # PID 0160 is not supported.
       #
-      # 0103, 0124, 0147 and 014A were confirmed with live responses.
-      # 014D, 014E and 0151 remain temporary zTEST probes until observed.
+      # 0103, 0124, 0147, 014A, 014D, 014E and 0151 were confirmed with live responses.
       # ----------------------------------------------------------------------
       - key: "fuel_system_status"
         platform: "text_sensor"
@@ -389,7 +388,7 @@ devices:
         formula: "a/2.55"
         update_interval: "5s"
 
-      - key: "z_time_with_mil"
+      - key: "time_with_mil"
         device_class: "duration"
         unit: "min"
         state_class: "measurement"
@@ -398,9 +397,9 @@ devices:
         mode: "01"
         pid: "4D"
         formula: "a*256+b"
-        update_interval: "10s"
+        update_interval: "60s"
 
-      - key: "z_time_since_dtc_clear"
+      - key: "time_since_dtc_clear"
         device_class: "duration"
         unit: "min"
         state_class: "measurement"
@@ -409,14 +408,14 @@ devices:
         mode: "01"
         pid: "4E"
         formula: "a*256+b"
-        update_interval: "10s"
+        update_interval: "60s"
 
-      - key: "z_fuel_type"
+      - key: "fuel_type"
         platform: "text_sensor"
         entity_category: "diagnostic"
         mode: "01"
         pid: "51"
-        update_interval: "10s"
+        update_interval: "24h"
         decode:
           offset: 0
           length: 1
@@ -627,7 +626,7 @@ devices:
           type: "uint8"
           scale: 0.025
 
-      - key: "z_cvt_brake_switch_candidate"
+      - key: "cvt_brake_switch"
         platform: "binary_sensor"
         icon: "mdi:car-brake-alert"
         entity_category: "diagnostic"
@@ -637,9 +636,8 @@ devices:
         pre_commands:
           - "ATSH7E1"
           - "10C0"
-        # Candidate from earlier driving correlation: bit 3 appeared to set
-        # during braking. A later rapid brake-pumping test did not capture an
-        # ON transition, so keep this as zTEST until a held-pedal test validates it.
+        # Confirmed from live logs: bit 3 is ON with the brake pedal depressed
+        # and OFF after release.
         decode:
           offset: 53
           length: 1
