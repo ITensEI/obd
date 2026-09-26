@@ -302,6 +302,7 @@ devices:
         update_interval: "30s"
 
       - key: "afr_b1s1_equivalence_ratio"
+        unit: "λ"
         state_class: "measurement"
         accuracy_decimals: 3
         mode: "01"
@@ -349,6 +350,7 @@ devices:
         update_interval: "2s"
 
       - key: "commanded_equivalence_ratio"
+        unit: "λ"
         state_class: "measurement"
         accuracy_decimals: 3
         mode: "01"
@@ -464,6 +466,7 @@ devices:
           scale: 32.0
 
       - key: "cvt_gear_ratio"
+        unit: ":1"
         state_class: "measurement"
         accuracy_decimals: 2
         mode: "21"
