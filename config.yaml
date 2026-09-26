@@ -647,9 +647,9 @@ devices:
       # Reverse-engineered Nissan data places absolute odometer in data bytes
       # 8-10 (1-based), which are h/i/j after HassBle removes the 61 01 echo.
       #
-      # Probe B: same-era Nissan ECM DID 2006.
-      #   ATSH7E0 -> 22 2006
-      # Reverse-engineered Nissan data identifies the three returned bytes as
+      # Probe B-D: same-era Nissan ECM DIDs 2006, 2472 and 2543.
+      #   ATSH7E0 -> 22 2006 / 2472 / 2543
+      # Reverse-engineered Nissan data identifies each three-byte response as
       # absolute vehicle mileage in kilometres.
       # ----------------------------------------------------------------------
       - key: "z_odometer_cluster_2101"
@@ -678,6 +678,34 @@ devices:
         pid: "2006"
         formula: "a*65536+b*256+c"
         update_interval: "30s"
+        pre_commands:
+          - "ATSH7E0"
+
+      - key: "z_odometer_ecm_222472"
+        device_class: "distance"
+        unit: "km"
+        state_class: "total_increasing"
+        icon: "mdi:counter"
+        accuracy_decimals: 0
+        entity_category: "diagnostic"
+        mode: "22"
+        pid: "2472"
+        formula: "a*65536+b*256+c"
+        update_interval: "60s"
+        pre_commands:
+          - "ATSH7E0"
+
+      - key: "z_odometer_ecm_222543"
+        device_class: "distance"
+        unit: "km"
+        state_class: "total_increasing"
+        icon: "mdi:counter"
+        accuracy_decimals: 0
+        entity_category: "diagnostic"
+        mode: "22"
+        pid: "2543"
+        formula: "a*65536+b*256+c"
+        update_interval: "60s"
         pre_commands:
           - "ATSH7E0"
 
