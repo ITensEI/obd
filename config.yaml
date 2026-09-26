@@ -321,6 +321,65 @@ devices:
         update_interval: "2s"
 
       # ----------------------------------------------------------------------
+      # zTEST — Standard OBD-II supported-PID bitmaps
+      #
+      # Temporary read-only discovery probes. The raw responses tell us which
+      # additional standard Mode 01 PIDs the ECU explicitly advertises.
+      # Remove after the next log review.
+      # ----------------------------------------------------------------------
+      - key: "z_supported_pids_01_20"
+        entity_category: "diagnostic"
+        icon: "mdi:binary"
+        accuracy_decimals: 0
+        mode: "01"
+        pid: "00"
+        update_interval: "60s"
+        decode:
+          offset: 0
+          length: 4
+          type: "uint32"
+          endian: "big"
+
+      - key: "z_supported_pids_21_40"
+        entity_category: "diagnostic"
+        icon: "mdi:binary"
+        accuracy_decimals: 0
+        mode: "01"
+        pid: "20"
+        update_interval: "60s"
+        decode:
+          offset: 0
+          length: 4
+          type: "uint32"
+          endian: "big"
+
+      - key: "z_supported_pids_41_60"
+        entity_category: "diagnostic"
+        icon: "mdi:binary"
+        accuracy_decimals: 0
+        mode: "01"
+        pid: "40"
+        update_interval: "60s"
+        decode:
+          offset: 0
+          length: 4
+          type: "uint32"
+          endian: "big"
+
+      - key: "z_supported_pids_61_80"
+        entity_category: "diagnostic"
+        icon: "mdi:binary"
+        accuracy_decimals: 0
+        mode: "01"
+        pid: "60"
+        update_interval: "60s"
+        decode:
+          offset: 0
+          length: 4
+          type: "uint32"
+          endian: "big"
+
+      # ----------------------------------------------------------------------
       # Nissan RE0F10A CVT — read-only TCM Data Monitor block
       #
       # Source sequence: ATSH7E1 -> diagnostic session 10C0 -> Mode 21 PID 01.
@@ -533,6 +592,7 @@ devices:
             "9": "R"
             "3": "N"
             "31": "D"
+            "22": "L"
 
       - key: "cvt_deterioration"
         unit: "points"
@@ -552,79 +612,3 @@ devices:
           type: "uint32"
           endian: "big"
 
-    # ------------------------------------------------------------------------
-    # zTEST — Nissan BCM control probes
-    # Raw service-30 mappings are same-era Nissan probes, not yet B16-confirmed.
-    # ------------------------------------------------------------------------
-    controls:
-      - key: "z_bcm_1_set_header"
-        type: "button"
-        name: "zTest BCM 1 - Set Header 745"
-        icon: "mdi:car-cog"
-        entity_category: "diagnostic"
-        command:
-          press: "415453483734350D"   # ASCII: ATSH745\r
-
-      - key: "z_bcm_2_start_session"
-        type: "button"
-        name: "zTest BCM 2 - Start Diagnostic Session"
-        icon: "mdi:car-cog"
-        entity_category: "diagnostic"
-        command:
-          press: "313043300D"         # ASCII: 10C0\r
-
-      - key: "z_bcm_interior_lights_on"
-        type: "button"
-        name: "zTest BCM Probe - Interior Lights On"
-        icon: "mdi:lightbulb-on-outline"
-        entity_category: "diagnostic"
-        command:
-          press: "33303137323030310D" # ASCII: 30172001\r
-
-      - key: "z_bcm_interior_lights_off"
-        type: "button"
-        name: "zTest BCM Probe - Interior Lights Off"
-        icon: "mdi:lightbulb-off-outline"
-        entity_category: "diagnostic"
-        command:
-          press: "33303137323030300D" # ASCII: 30172000\r
-
-      - key: "z_bcm_parking_lights_on"
-        type: "button"
-        name: "zTest BCM Probe - Parking Lights On"
-        icon: "mdi:car-parking-lights"
-        entity_category: "diagnostic"
-        command:
-          press: "33303341323030310D" # ASCII: 303A2001\r
-
-      - key: "z_bcm_parking_lights_off"
-        type: "button"
-        name: "zTest BCM Probe - Parking Lights Off"
-        icon: "mdi:car-parking-lights"
-        entity_category: "diagnostic"
-        command:
-          press: "33303341323030300D" # ASCII: 303A2000\r
-
-      - key: "z_bcm_lock_doors_probe"
-        type: "button"
-        name: "zTest BCM Probe - Lock Doors"
-        icon: "mdi:car-door-lock"
-        entity_category: "diagnostic"
-        command:
-          press: "33303037303030310D" # ASCII: 30070001\r
-
-      - key: "z_bcm_unlock_doors_probe"
-        type: "button"
-        name: "zTest BCM Probe - Unlock All Doors"
-        icon: "mdi:car-door-lock-open"
-        entity_category: "diagnostic"
-        command:
-          press: "33303037303030320D" # ASCII: 30070002\r
-
-      - key: "z_bcm_9_restore_header"
-        type: "button"
-        name: "zTest BCM 9 - Restore OBD Header 7DF"
-        icon: "mdi:restore"
-        entity_category: "diagnostic"
-        command:
-          press: "415453483744460D"   # ASCII: ATSH7DF\r
