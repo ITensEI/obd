@@ -1,0 +1,23 @@
+devices:
+  - id: sentra
+    name: "Sentra"
+    source: obd
+    obd:
+      service_uuid: "18F0"
+      tx_char_uuid: "2AF1"
+      rx_char_uuid: "2AF0"
+      tx_delay: "50ms"
+      auto_connect: true
+    sensors:
+      - key: rpm
+        preset: rpm
+        update_interval: 1s
+      - key: speed
+        preset: speed
+        update_interval: 1s
+      - key: coolant_temp
+        preset: coolant_temp
+        update_interval: 10s
+      - key: battery_voltage
+        preset: battery_voltage
+        update_interval: 10s
