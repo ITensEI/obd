@@ -636,23 +636,23 @@ devices:
           type: "uint32"
           endian: "big"
 
-
       # ----------------------------------------------------------------------
-      # zTEST — Nissan combination-meter odometer probes
+      # zTEST — Nissan odometer probes
       #
-      # Temporary discovery sensors. The leading "z" keeps them sorted at the
-      # bottom in HA. Remove these once the correct B16 combination-meter
-      # request/scale is confirmed.
+      # 2119 on header 743 was tested on this B16 and returned NO DATA, so the
+      # failed probes were removed.
       #
-      # Candidate from Nissan combination-meter reverse engineering:
-      #   CAN request header 0x743, local identifier 0x19 (Mode 21)
-      # Expected positive response: 61 19 AA BB CC
+      # Probe A: same-era Nissan combination-meter Data Monitor block.
+      #   ATSH743 -> 10C0 -> 2101
+      # Reverse-engineered Nissan data places absolute odometer in data bytes
+      # 8-10 (1-based), which are h/i/j after HassBle removes the 61 01 echo.
       #
-      # The first sensor tests the documented Nissan 3-byte kilometre value.
-      # The second tests a /10 scale without issuing an extra frequent poll;
-      # HassBle decodes matching mode/PID responses for all matching sensors.
+      # Probe B: same-era Nissan ECM DID 2006.
+      #   ATSH7E0 -> 22 2006
+      # Reverse-engineered Nissan data identifies the three returned bytes as
+      # absolute vehicle mileage in kilometres.
       # ----------------------------------------------------------------------
-      - key: "z_odometer_2119_km"
+      - key: "z_odometer_cluster_2101"
         device_class: "distance"
         unit: "km"
         state_class: "total_increasing"
@@ -660,22 +660,110 @@ devices:
         accuracy_decimals: 0
         entity_category: "diagnostic"
         mode: "21"
-        pid: "19"
-        formula: "a*65536+b*256+c"
+        pid: "01"
+        formula: "h*65536+i*256+j"
         update_interval: "30s"
         pre_commands:
           - "ATSH743"
+          - "10C0"
 
-      - key: "z_odometer_2119_div10"
+      - key: "z_odometer_ecm_222006"
         device_class: "distance"
         unit: "km"
         state_class: "total_increasing"
         icon: "mdi:counter"
-        accuracy_decimals: 1
+        accuracy_decimals: 0
         entity_category: "diagnostic"
-        mode: "21"
-        pid: "19"
-        formula: "(a*65536+b*256+c)/10"
-        update_interval: "24h"
+        mode: "22"
+        pid: "2006"
+        formula: "a*65536+b*256+c"
+        update_interval: "30s"
         pre_commands:
-          - "ATSH743"
+          - "ATSH7E0"
+
+    # ------------------------------------------------------------------------
+    # zTEST — Nissan BCM control probes
+    #
+    # HassBle 1.7.0 OBD controls write raw bytes to the BLE TX characteristic
+    # rather than using the ELM command queue. These command values therefore
+    # contain ASCII-encoded ELM commands including the trailing CR (0D).
+    #
+    # IMPORTANT: controls currently send ONE command per button and do not wait
+    # for the ELM prompt. Use the setup/action/restore buttons individually.
+    # Active sensor polling can race these commands, so these are experimental.
+    #
+    # Raw service-30 PID mappings below are documented on same-era Nissan CAN
+    # systems, NOT yet confirmed specifically on this 2010 B16 Sentra.
+    # ------------------------------------------------------------------------
+    controls:
+      - key: "z_bcm_1_set_header"
+        type: "button"
+        name: "zTest BCM 1 - Set Header 745"
+        icon: "mdi:car-cog"
+        entity_category: "diagnostic"
+        command:
+          press: "415453483734350D"   # ASCII: ATSH745\r
+
+      - key: "z_bcm_2_start_session"
+        type: "button"
+        name: "zTest BCM 2 - Start Diagnostic Session"
+        icon: "mdi:car-cog"
+        entity_category: "diagnostic"
+        command:
+          press: "313043300D"         # ASCII: 10C0\r
+
+      - key: "z_bcm_interior_lights_on"
+        type: "button"
+        name: "zTest BCM Probe - Interior Lights On"
+        icon: "mdi:lightbulb-on-outline"
+        entity_category: "diagnostic"
+        command:
+          press: "33303137323030310D" # ASCII: 30172001\r
+
+      - key: "z_bcm_interior_lights_off"
+        type: "button"
+        name: "zTest BCM Probe - Interior Lights Off"
+        icon: "mdi:lightbulb-off-outline"
+        entity_category: "diagnostic"
+        command:
+          press: "33303137323030300D" # ASCII: 30172000\r
+
+      - key: "z_bcm_parking_lights_on"
+        type: "button"
+        name: "zTest BCM Probe - Parking Lights On"
+        icon: "mdi:car-parking-lights"
+        entity_category: "diagnostic"
+        command:
+          press: "33303341323030310D" # ASCII: 303A2001\r
+
+      - key: "z_bcm_parking_lights_off"
+        type: "button"
+        name: "zTest BCM Probe - Parking Lights Off"
+        icon: "mdi:car-parking-lights"
+        entity_category: "diagnostic"
+        command:
+          press: "33303341323030300D" # ASCII: 303A2000\r
+
+      - key: "z_bcm_lock_doors_probe"
+        type: "button"
+        name: "zTest BCM Probe - Lock Doors"
+        icon: "mdi:car-door-lock"
+        entity_category: "diagnostic"
+        command:
+          press: "33303037303030310D" # ASCII: 30070001\r
+
+      - key: "z_bcm_unlock_doors_probe"
+        type: "button"
+        name: "zTest BCM Probe - Unlock All Doors"
+        icon: "mdi:car-door-lock-open"
+        entity_category: "diagnostic"
+        command:
+          press: "33303037303030320D" # ASCII: 30070002\r
+
+      - key: "z_bcm_9_restore_header"
+        type: "button"
+        name: "zTest BCM 9 - Restore OBD Header 7DF"
+        icon: "mdi:restore"
+        entity_category: "diagnostic"
+        command:
+          press: "415453483744460D"   # ASCII: ATSH7DF\r
