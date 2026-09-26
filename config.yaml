@@ -635,3 +635,47 @@ devices:
           length: 4
           type: "uint32"
           endian: "big"
+
+
+      # ----------------------------------------------------------------------
+      # zTEST — Nissan combination-meter odometer probes
+      #
+      # Temporary discovery sensors. The leading "z" keeps them sorted at the
+      # bottom in HA. Remove these once the correct B16 combination-meter
+      # request/scale is confirmed.
+      #
+      # Candidate from Nissan combination-meter reverse engineering:
+      #   CAN request header 0x743, local identifier 0x19 (Mode 21)
+      # Expected positive response: 61 19 AA BB CC
+      #
+      # The first sensor tests the documented Nissan 3-byte kilometre value.
+      # The second tests a /10 scale without issuing an extra frequent poll;
+      # HassBle decodes matching mode/PID responses for all matching sensors.
+      # ----------------------------------------------------------------------
+      - key: "z_odometer_2119_km"
+        device_class: "distance"
+        unit: "km"
+        state_class: "total_increasing"
+        icon: "mdi:counter"
+        accuracy_decimals: 0
+        entity_category: "diagnostic"
+        mode: "21"
+        pid: "19"
+        formula: "a*65536+b*256+c"
+        update_interval: "30s"
+        pre_commands:
+          - "ATSH743"
+
+      - key: "z_odometer_2119_div10"
+        device_class: "distance"
+        unit: "km"
+        state_class: "total_increasing"
+        icon: "mdi:counter"
+        accuracy_decimals: 1
+        entity_category: "diagnostic"
+        mode: "21"
+        pid: "19"
+        formula: "(a*65536+b*256+c)/10"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH743"
