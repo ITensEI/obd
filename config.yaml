@@ -1,23 +1,130 @@
 devices:
-  - id: sentra
+  - id: "sentra"
     name: "Sentra"
-    source: obd
+    source: "obd"
+
     obd:
       service_uuid: "18F0"
       tx_char_uuid: "2AF1"
       rx_char_uuid: "2AF0"
       tx_delay: "50ms"
       auto_connect: true
+
     sensors:
-      - key: rpm
-        preset: rpm
-        update_interval: 1s
-      - key: speed
-        preset: speed
-        update_interval: 1s
-      - key: coolant_temp
-        preset: coolant_temp
-        update_interval: 10s
-      - key: battery_voltage
-        preset: battery_voltage
-        update_interval: 10s
+      - key: "actual_torque"
+        unit: "%"
+        state_class: "measurement"
+        icon: "mdi:gauge"
+        accuracy_decimals: 0
+        preset: "actual_torque"
+        pid: "62"
+        formula: "a-125"
+
+      - key: "ambient_temp"
+        device_class: "temperature"
+        unit: "°C"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        preset: "ambient_temp"
+        pid: "46"
+        formula: "a-40"
+        update_interval: "10s"
+
+      - key: "battery_voltage"
+        device_class: "voltage"
+        unit: "V"
+        state_class: "measurement"
+        accuracy_decimals: 2
+        preset: "battery_voltage"
+        pid: "42"
+        formula: "(a*256+b)/1000"
+
+      - key: "coolant_temp"
+        device_class: "temperature"
+        unit: "°C"
+        state_class: "measurement"
+        icon: "mdi:coolant-temperature"
+        accuracy_decimals: 1
+        preset: "coolant_temp"
+        pid: "05"
+        formula: "a-40"
+        update_interval: "10s"
+
+      - key: "engine_load"
+        unit: "%"
+        state_class: "measurement"
+        icon: "mdi:engine"
+        accuracy_decimals: 1
+        preset: "engine_load"
+        pid: "04"
+        formula: "a/2.55"
+
+      - key: "fuel_level"
+        unit: "%"
+        state_class: "measurement"
+        icon: "mdi:gas-station"
+        accuracy_decimals: 1
+        preset: "fuel_level"
+        pid: "2F"
+        formula: "a/2.55"
+        update_interval: "30s"
+
+      - key: "intake_air_temp"
+        device_class: "temperature"
+        unit: "°C"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        preset: "intake_air_temp"
+        pid: "0F"
+        formula: "a-40"
+        update_interval: "10s"
+
+      - key: "odometer"
+        device_class: "distance"
+        unit: "km"
+        state_class: "total_increasing"
+        accuracy_decimals: 1
+        preset: "odometer"
+        pid: "A6"
+        formula: "(a*16777216+b*65536+c*256+d)/10"
+        update_interval: "30s"
+
+      - key: "rpm"
+        unit: "rpm"
+        state_class: "measurement"
+        icon: "mdi:gauge"
+        accuracy_decimals: 0
+        preset: "rpm"
+        pid: "0C"
+        formula: "(a*256+b)/4"
+        update_interval: "1s"
+
+      - key: "run_time"
+        device_class: "duration"
+        unit: "s"
+        state_class: "total_increasing"
+        accuracy_decimals: 0
+        preset: "run_time"
+        pid: "1F"
+        formula: "a*256+b"
+
+      - key: "speed"
+        device_class: "speed"
+        unit: "km/h"
+        state_class: "measurement"
+        icon: "mdi:speedometer"
+        accuracy_decimals: 0
+        preset: "speed"
+        pid: "0D"
+        formula: "a"
+        update_interval: "1s"
+
+      - key: "throttle"
+        unit: "%"
+        state_class: "measurement"
+        icon: "mdi:gauge"
+        accuracy_decimals: 1
+        preset: "throttle"
+        pid: "11"
+        formula: "a/2.55"
+        update_interval: "1s"
