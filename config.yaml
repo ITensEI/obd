@@ -642,31 +642,15 @@ devices:
       # 2119 on header 743 was tested on this B16 and returned NO DATA, so the
       # failed probes were removed.
       #
-      # Probe A: same-era Nissan combination-meter Data Monitor block.
-      #   ATSH743 -> 10C0 -> 2101
-      # Reverse-engineered Nissan data places absolute odometer in data bytes
-      # 8-10 (1-based), which are h/i/j after HassBle removes the 61 01 echo.
+      # The combination-meter 743/2101 candidate is NOT active here because
+      # HassBle 1.7.0 matches OBD responses by mode+PID only. It would collide
+      # with the existing CVT 7E1/2101 block and could publish false mileage.
       #
-      # Probe B-D: same-era Nissan ECM DIDs 2006, 2472 and 2543.
+      # Active probes: same-era Nissan ECM DIDs 2006, 2472 and 2543.
       #   ATSH7E0 -> 22 2006 / 2472 / 2543
       # Reverse-engineered Nissan data identifies each three-byte response as
       # absolute vehicle mileage in kilometres.
       # ----------------------------------------------------------------------
-      - key: "z_odometer_cluster_2101"
-        device_class: "distance"
-        unit: "km"
-        state_class: "total_increasing"
-        icon: "mdi:counter"
-        accuracy_decimals: 0
-        entity_category: "diagnostic"
-        mode: "21"
-        pid: "01"
-        formula: "h*65536+i*256+j"
-        update_interval: "30s"
-        pre_commands:
-          - "ATSH743"
-          - "10C0"
-
       - key: "z_odometer_ecm_222006"
         device_class: "distance"
         unit: "km"
