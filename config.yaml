@@ -111,8 +111,10 @@ devices:
         update_interval: "30s"
 
       # ----------------------------------------------------------------------
-      # Standard OBD-II discovery/monitoring set
-      # Unsupported PIDs will simply log NO DATA and can be pruned after testing.
+      # Standard OBD-II monitoring set
+      # 2026-09-26 survey removed confirmed unsupported PIDs:
+      # 010A, 010B, 0114, 0134, 015C, 015E.
+      # PID 0115 voltage is supported; its trim byte is FF (trim not used).
       # ----------------------------------------------------------------------
       - key: "mil_status"
         platform: "binary_sensor"
@@ -159,25 +161,6 @@ devices:
         formula: "(a-128)*100/128"
         update_interval: "5s"
 
-      - key: "fuel_pressure"
-        device_class: "pressure"
-        unit: "kPa"
-        state_class: "measurement"
-        accuracy_decimals: 0
-        mode: "01"
-        pid: "0A"
-        formula: "a*3"
-        update_interval: "10s"
-
-      - key: "intake_manifold_pressure"
-        device_class: "pressure"
-        unit: "kPa"
-        state_class: "measurement"
-        accuracy_decimals: 0
-        mode: "01"
-        pid: "0B"
-        formula: "a"
-        update_interval: "2s"
 
       - key: "timing_advance"
         unit: "°"
@@ -198,24 +181,6 @@ devices:
         formula: "(a*256+b)/100"
         update_interval: "2s"
 
-      - key: "o2_b1s1_voltage"
-        device_class: "voltage"
-        unit: "V"
-        state_class: "measurement"
-        accuracy_decimals: 3
-        mode: "01"
-        pid: "14"
-        formula: "a/200"
-        update_interval: "2s"
-
-      - key: "o2_b1s1_trim"
-        unit: "%"
-        state_class: "measurement"
-        accuracy_decimals: 1
-        mode: "01"
-        pid: "14"
-        formula: "(b-128)*100/128"
-        update_interval: "24h"
 
       - key: "o2_b1s2_voltage"
         device_class: "voltage"
@@ -227,14 +192,6 @@ devices:
         formula: "a/200"
         update_interval: "5s"
 
-      - key: "o2_b1s2_trim"
-        unit: "%"
-        state_class: "measurement"
-        accuracy_decimals: 1
-        mode: "01"
-        pid: "15"
-        formula: "(b-128)*100/128"
-        update_interval: "24h"
 
       - key: "distance_with_mil"
         device_class: "distance"
@@ -301,24 +258,6 @@ devices:
         formula: "a"
         update_interval: "30s"
 
-      - key: "afr_b1s1_equivalence_ratio"
-        unit: "λ"
-        state_class: "measurement"
-        accuracy_decimals: 3
-        mode: "01"
-        pid: "34"
-        formula: "(a*256+b)/32768"
-        update_interval: "2s"
-
-      - key: "afr_b1s1_current"
-        device_class: "current"
-        unit: "mA"
-        state_class: "measurement"
-        accuracy_decimals: 2
-        mode: "01"
-        pid: "34"
-        formula: "(c*256+d)/256-128"
-        update_interval: "24h"
 
       - key: "catalyst_temp_b1s1"
         device_class: "temperature"
@@ -385,24 +324,6 @@ devices:
         formula: "a/2.55"
         update_interval: "2s"
 
-      - key: "engine_oil_temp"
-        device_class: "temperature"
-        unit: "°C"
-        state_class: "measurement"
-        accuracy_decimals: 1
-        mode: "01"
-        pid: "5C"
-        formula: "a-40"
-        update_interval: "10s"
-
-      - key: "engine_fuel_rate"
-        unit: "L/h"
-        state_class: "measurement"
-        accuracy_decimals: 2
-        mode: "01"
-        pid: "5E"
-        formula: "(a*256+b)/20"
-        update_interval: "2s"
 
       # ----------------------------------------------------------------------
       # Nissan RE0F10A CVT — read-only TCM Data Monitor block
@@ -651,62 +572,8 @@ devices:
       # Reverse-engineered Nissan data identifies each three-byte response as
       # absolute vehicle mileage in kilometres.
       # ----------------------------------------------------------------------
-      - key: "z_odometer_ecm_222006"
-        device_class: "distance"
-        unit: "km"
-        state_class: "total_increasing"
-        icon: "mdi:counter"
-        accuracy_decimals: 0
-        entity_category: "diagnostic"
-        mode: "22"
-        pid: "2006"
-        formula: "a*65536+b*256+c"
-        update_interval: "30s"
-        pre_commands:
-          - "ATSH7E0"
 
-      - key: "z_odometer_ecm_222472"
-        device_class: "distance"
-        unit: "km"
-        state_class: "total_increasing"
-        icon: "mdi:counter"
-        accuracy_decimals: 0
-        entity_category: "diagnostic"
-        mode: "22"
-        pid: "2472"
-        formula: "a*65536+b*256+c"
-        update_interval: "60s"
-        pre_commands:
-          - "ATSH7E0"
 
-      - key: "z_odometer_ecm_222543"
-        device_class: "distance"
-        unit: "km"
-        state_class: "total_increasing"
-        icon: "mdi:counter"
-        accuracy_decimals: 0
-        entity_category: "diagnostic"
-        mode: "22"
-        pid: "2543"
-        formula: "a*65536+b*256+c"
-        update_interval: "60s"
-        pre_commands:
-          - "ATSH7E0"
-
-    # ------------------------------------------------------------------------
-    # zTEST — Nissan BCM control probes
-    #
-    # HassBle 1.7.0 OBD controls write raw bytes to the BLE TX characteristic
-    # rather than using the ELM command queue. These command values therefore
-    # contain ASCII-encoded ELM commands including the trailing CR (0D).
-    #
-    # IMPORTANT: controls currently send ONE command per button and do not wait
-    # for the ELM prompt. Use the setup/action/restore buttons individually.
-    # Active sensor polling can race these commands, so these are experimental.
-    #
-    # Raw service-30 PID mappings below are documented on same-era Nissan CAN
-    # systems, NOT yet confirmed specifically on this 2010 B16 Sentra.
-    # ------------------------------------------------------------------------
     controls:
       - key: "z_bcm_1_set_header"
         type: "button"
