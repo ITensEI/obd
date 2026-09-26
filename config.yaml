@@ -161,7 +161,6 @@ devices:
         formula: "(a-128)*100/128"
         update_interval: "5s"
 
-
       - key: "timing_advance"
         unit: "°"
         state_class: "measurement"
@@ -181,7 +180,6 @@ devices:
         formula: "(a*256+b)/100"
         update_interval: "2s"
 
-
       - key: "o2_b1s2_voltage"
         device_class: "voltage"
         unit: "V"
@@ -191,7 +189,6 @@ devices:
         pid: "15"
         formula: "a/200"
         update_interval: "5s"
-
 
       - key: "distance_with_mil"
         device_class: "distance"
@@ -258,7 +255,6 @@ devices:
         formula: "a"
         update_interval: "30s"
 
-
       - key: "catalyst_temp_b1s1"
         device_class: "temperature"
         unit: "°C"
@@ -323,7 +319,6 @@ devices:
         pid: "4C"
         formula: "a/2.55"
         update_interval: "2s"
-
 
       # ----------------------------------------------------------------------
       # Nissan RE0F10A CVT — read-only TCM Data Monitor block
@@ -557,23 +552,10 @@ devices:
           type: "uint32"
           endian: "big"
 
-      # ----------------------------------------------------------------------
-      # zTEST — Nissan odometer probes
-      #
-      # 2119 on header 743 was tested on this B16 and returned NO DATA, so the
-      # failed probes were removed.
-      #
-      # The combination-meter 743/2101 candidate is NOT active here because
-      # HassBle 1.7.0 matches OBD responses by mode+PID only. It would collide
-      # with the existing CVT 7E1/2101 block and could publish false mileage.
-      #
-      # Active probes: same-era Nissan ECM DIDs 2006, 2472 and 2543.
-      #   ATSH7E0 -> 22 2006 / 2472 / 2543
-      # Reverse-engineered Nissan data identifies each three-byte response as
-      # absolute vehicle mileage in kilometres.
-      # ----------------------------------------------------------------------
-
-
+    # ------------------------------------------------------------------------
+    # zTEST — Nissan BCM control probes
+    # Raw service-30 mappings are same-era Nissan probes, not yet B16-confirmed.
+    # ------------------------------------------------------------------------
     controls:
       - key: "z_bcm_1_set_header"
         type: "button"
