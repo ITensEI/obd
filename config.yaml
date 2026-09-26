@@ -321,7 +321,7 @@ devices:
         update_interval: "2s"
 
       # ----------------------------------------------------------------------
-      # zTEST — Additional standard Mode 01 PIDs advertised by this ECU
+      # Additional standard Mode 01 PIDs advertised and confirmed on this ECU
       #
       # Support bitmaps captured 2026-09-26:
       #   0100 -> BE1FA813
@@ -329,10 +329,10 @@ devices:
       #   0140 -> FADC8000
       # PID 0160 is not supported.
       #
-      # These are temporary read-only probes for useful supported PIDs that
-      # are not yet otherwise represented in this config.
+      # 0103, 0124, 0147 and 014A were confirmed with live responses.
+      # 014D, 014E and 0151 remain temporary zTEST probes until observed.
       # ----------------------------------------------------------------------
-      - key: "z_fuel_system_status"
+      - key: "fuel_system_status"
         platform: "text_sensor"
         entity_category: "diagnostic"
         mode: "01"
@@ -350,7 +350,7 @@ devices:
             "8": "Open loop - system failure"
             "16": "Closed loop - fault"
 
-      - key: "z_o2_b1s1_equivalence_ratio"
+      - key: "o2_b1s1_equivalence_ratio"
         unit: "λ"
         state_class: "measurement"
         accuracy_decimals: 3
@@ -359,7 +359,7 @@ devices:
         formula: "(a*256+b)/32768"
         update_interval: "5s"
 
-      - key: "z_o2_b1s1_voltage"
+      - key: "o2_b1s1_voltage"
         device_class: "voltage"
         unit: "V"
         state_class: "measurement"
@@ -369,7 +369,8 @@ devices:
         formula: "(c*256+d)/8192"
         update_interval: "24h"
 
-      - key: "z_throttle_position_b"
+      - key: "throttle_position_b"
+        entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
         accuracy_decimals: 1
@@ -378,7 +379,8 @@ devices:
         formula: "a/2.55"
         update_interval: "5s"
 
-      - key: "z_accelerator_position_e"
+      - key: "accelerator_position_e"
+        entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
         accuracy_decimals: 1
