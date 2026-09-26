@@ -574,6 +574,29 @@ devices:
           type: "uint8"
           scale: 0.025
 
+      - key: "z_cvt_lockup_solenoid_current"
+        device_class: "current"
+        unit: "A"
+        state_class: "measurement"
+        icon: "mdi:current-dc"
+        accuracy_decimals: 3
+        entity_category: "diagnostic"
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        # CVTz50 ISOLT1 bytes [42],[43] include the 61 01 response header.
+        # HassBle strips that header, hence offset 40 here. Temporary zTEST:
+        # validate against expected ~0 A unlocked / ~0.7 A locked.
+        decode:
+          offset: 40
+          length: 2
+          type: "uint16"
+          endian: "big"
+          scale: 0.001
+
       - key: "cvt_selector"
         platform: "text_sensor"
         icon: "mdi:car-shift-pattern"
