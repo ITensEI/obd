@@ -10,103 +10,33 @@ devices:
       tx_delay: "50ms"
       auto_connect: true
 
+      # RE0F10A/Jatco CVT monitoring requires these ELM327 features.
+      # HassBle's built-in ATSP0 runs first; ATSP6 then locks this 2010 Sentra
+      # to ISO 15765-4 CAN (11-bit, 500 kbit/s), matching CVTz50's sequence.
+      init_commands:
+        - "ATAL"
+        - "ATST32"
+        - "ATSW00"
+        - "ATSP6"
+
+      # Restore the normal functional OBD-II CAN header after a module-specific
+      # CVT request has used ATSH7E1.
+      default_commands:
+        - "ATSH7DF"
+
     sensors:
-      - key: "actual_torque"
-        unit: "%"
-        state_class: "measurement"
-        icon: "mdi:gauge"
-        accuracy_decimals: 0
-        preset: "actual_torque"
-        pid: "62"
-        formula: "a-125"
-
-      - key: "ambient_temp"
-        device_class: "temperature"
-        unit: "°C"
-        state_class: "measurement"
-        accuracy_decimals: 1
-        preset: "ambient_temp"
-        pid: "46"
-        formula: "a-40"
-        update_interval: "10s"
-
-      - key: "battery_voltage"
-        device_class: "voltage"
-        unit: "V"
-        state_class: "measurement"
-        accuracy_decimals: 2
-        preset: "battery_voltage"
-        pid: "42"
-        formula: "(a*256+b)/1000"
-
-      - key: "coolant_temp"
-        device_class: "temperature"
-        unit: "°C"
-        state_class: "measurement"
-        icon: "mdi:coolant-temperature"
-        accuracy_decimals: 1
-        preset: "coolant_temp"
-        pid: "05"
-        formula: "a-40"
-        update_interval: "10s"
-
-      - key: "engine_load"
-        unit: "%"
-        state_class: "measurement"
-        icon: "mdi:engine"
-        accuracy_decimals: 1
-        preset: "engine_load"
-        pid: "04"
-        formula: "a/2.55"
-
-      - key: "fuel_level"
-        unit: "%"
-        state_class: "measurement"
-        icon: "mdi:gas-station"
-        accuracy_decimals: 1
-        preset: "fuel_level"
-        pid: "2F"
-        formula: "a/2.55"
-        update_interval: "30s"
-
-      - key: "intake_air_temp"
-        device_class: "temperature"
-        unit: "°C"
-        state_class: "measurement"
-        accuracy_decimals: 1
-        preset: "intake_air_temp"
-        pid: "0F"
-        formula: "a-40"
-        update_interval: "10s"
-
-      - key: "odometer"
-        device_class: "distance"
-        unit: "km"
-        state_class: "total_increasing"
-        accuracy_decimals: 1
-        preset: "odometer"
-        pid: "A6"
-        formula: "(a*16777216+b*65536+c*256+d)/10"
-        update_interval: "30s"
-
+      # ----------------------------------------------------------------------
+      # Core engine / vehicle data already confirmed on this car
+      # ----------------------------------------------------------------------
       - key: "rpm"
         unit: "rpm"
         state_class: "measurement"
         icon: "mdi:gauge"
         accuracy_decimals: 0
-        preset: "rpm"
+        mode: "01"
         pid: "0C"
         formula: "(a*256+b)/4"
         update_interval: "1s"
-
-      - key: "run_time"
-        device_class: "duration"
-        unit: "s"
-        state_class: "total_increasing"
-        accuracy_decimals: 0
-        preset: "run_time"
-        pid: "1F"
-        formula: "a*256+b"
 
       - key: "speed"
         device_class: "speed"
@@ -114,7 +44,7 @@ devices:
         state_class: "measurement"
         icon: "mdi:speedometer"
         accuracy_decimals: 0
-        preset: "speed"
+        mode: "01"
         pid: "0D"
         formula: "a"
         update_interval: "1s"
@@ -124,7 +54,581 @@ devices:
         state_class: "measurement"
         icon: "mdi:gauge"
         accuracy_decimals: 1
-        preset: "throttle"
+        mode: "01"
         pid: "11"
         formula: "a/2.55"
         update_interval: "1s"
+
+      - key: "engine_load"
+        unit: "%"
+        state_class: "measurement"
+        icon: "mdi:engine"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "04"
+        formula: "a/2.55"
+        update_interval: "2s"
+
+      - key: "coolant_temp"
+        device_class: "temperature"
+        unit: "°C"
+        state_class: "measurement"
+        icon: "mdi:coolant-temperature"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "05"
+        formula: "a-40"
+        update_interval: "10s"
+
+      - key: "intake_air_temp"
+        device_class: "temperature"
+        unit: "°C"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "0F"
+        formula: "a-40"
+        update_interval: "10s"
+
+      - key: "fuel_level"
+        unit: "%"
+        state_class: "measurement"
+        icon: "mdi:gas-station"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "2F"
+        formula: "a/2.55"
+        update_interval: "30s"
+
+      - key: "run_time"
+        device_class: "duration"
+        unit: "s"
+        state_class: "measurement"
+        accuracy_decimals: 0
+        mode: "01"
+        pid: "1F"
+        formula: "a*256+b"
+        update_interval: "30s"
+
+      # ----------------------------------------------------------------------
+      # Standard OBD-II discovery/monitoring set
+      # Unsupported PIDs will simply log NO DATA and can be pruned after testing.
+      # ----------------------------------------------------------------------
+      - key: "mil_status"
+        platform: "binary_sensor"
+        icon: "mdi:engine-alert"
+        mode: "01"
+        pid: "01"
+        update_interval: "10s"
+        decode:
+          offset: 0
+          length: 1
+          type: "uint8"
+          bitmask: 128
+          map:
+            "0": "off"
+            "128": "on"
+
+      - key: "stored_dtc_count"
+        entity_category: "diagnostic"
+        accuracy_decimals: 0
+        mode: "01"
+        pid: "01"
+        update_interval: "24h"
+        decode:
+          offset: 0
+          length: 1
+          type: "uint8"
+          bitmask: 127
+
+      - key: "short_fuel_trim_b1"
+        unit: "%"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "06"
+        formula: "(a-128)*100/128"
+        update_interval: "2s"
+
+      - key: "long_fuel_trim_b1"
+        unit: "%"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "07"
+        formula: "(a-128)*100/128"
+        update_interval: "5s"
+
+      - key: "fuel_pressure"
+        device_class: "pressure"
+        unit: "kPa"
+        state_class: "measurement"
+        accuracy_decimals: 0
+        mode: "01"
+        pid: "0A"
+        formula: "a*3"
+        update_interval: "10s"
+
+      - key: "intake_manifold_pressure"
+        device_class: "pressure"
+        unit: "kPa"
+        state_class: "measurement"
+        accuracy_decimals: 0
+        mode: "01"
+        pid: "0B"
+        formula: "a"
+        update_interval: "2s"
+
+      - key: "timing_advance"
+        unit: "°"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "0E"
+        formula: "a/2-64"
+        update_interval: "2s"
+
+      - key: "maf"
+        unit: "g/s"
+        state_class: "measurement"
+        icon: "mdi:air-filter"
+        accuracy_decimals: 2
+        mode: "01"
+        pid: "10"
+        formula: "(a*256+b)/100"
+        update_interval: "2s"
+
+      - key: "o2_b1s1_voltage"
+        device_class: "voltage"
+        unit: "V"
+        state_class: "measurement"
+        accuracy_decimals: 3
+        mode: "01"
+        pid: "14"
+        formula: "a/200"
+        update_interval: "2s"
+
+      - key: "o2_b1s1_trim"
+        unit: "%"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "14"
+        formula: "(b-128)*100/128"
+        update_interval: "24h"
+
+      - key: "o2_b1s2_voltage"
+        device_class: "voltage"
+        unit: "V"
+        state_class: "measurement"
+        accuracy_decimals: 3
+        mode: "01"
+        pid: "15"
+        formula: "a/200"
+        update_interval: "5s"
+
+      - key: "o2_b1s2_trim"
+        unit: "%"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "15"
+        formula: "(b-128)*100/128"
+        update_interval: "24h"
+
+      - key: "distance_with_mil"
+        device_class: "distance"
+        unit: "km"
+        state_class: "measurement"
+        accuracy_decimals: 0
+        mode: "01"
+        pid: "21"
+        formula: "a*256+b"
+        update_interval: "60s"
+
+      - key: "commanded_evap_purge"
+        unit: "%"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "2E"
+        formula: "a/2.55"
+        update_interval: "5s"
+
+      - key: "warmups_since_clear"
+        unit: "cycles"
+        state_class: "measurement"
+        accuracy_decimals: 0
+        entity_category: "diagnostic"
+        mode: "01"
+        pid: "30"
+        formula: "a"
+        update_interval: "60s"
+
+      - key: "distance_since_clear"
+        device_class: "distance"
+        unit: "km"
+        state_class: "measurement"
+        accuracy_decimals: 0
+        entity_category: "diagnostic"
+        mode: "01"
+        pid: "31"
+        formula: "a*256+b"
+        update_interval: "60s"
+
+      - key: "evap_vapor_pressure"
+        device_class: "pressure"
+        unit: "Pa"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "32"
+        update_interval: "10s"
+        decode:
+          offset: 0
+          length: 2
+          type: "int16"
+          endian: "big"
+          scale: 0.25
+
+      - key: "barometric_pressure"
+        device_class: "pressure"
+        unit: "kPa"
+        state_class: "measurement"
+        accuracy_decimals: 0
+        mode: "01"
+        pid: "33"
+        formula: "a"
+        update_interval: "30s"
+
+      - key: "afr_b1s1_equivalence_ratio"
+        state_class: "measurement"
+        accuracy_decimals: 3
+        mode: "01"
+        pid: "34"
+        formula: "(a*256+b)/32768"
+        update_interval: "2s"
+
+      - key: "afr_b1s1_current"
+        device_class: "current"
+        unit: "mA"
+        state_class: "measurement"
+        accuracy_decimals: 2
+        mode: "01"
+        pid: "34"
+        formula: "(c*256+d)/256-128"
+        update_interval: "24h"
+
+      - key: "catalyst_temp_b1s1"
+        device_class: "temperature"
+        unit: "°C"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "3C"
+        formula: "(a*256+b)/10-40"
+        update_interval: "10s"
+
+      - key: "battery_voltage"
+        device_class: "voltage"
+        unit: "V"
+        state_class: "measurement"
+        accuracy_decimals: 2
+        mode: "01"
+        pid: "42"
+        formula: "(a*256+b)/1000"
+        update_interval: "10s"
+
+      - key: "absolute_load"
+        unit: "%"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "43"
+        formula: "(a*256+b)*100/255"
+        update_interval: "2s"
+
+      - key: "commanded_equivalence_ratio"
+        state_class: "measurement"
+        accuracy_decimals: 3
+        mode: "01"
+        pid: "44"
+        formula: "(a*256+b)/32768"
+        update_interval: "2s"
+
+      - key: "relative_throttle"
+        unit: "%"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "45"
+        formula: "a/2.55"
+        update_interval: "2s"
+
+      - key: "accelerator_position_d"
+        unit: "%"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "49"
+        formula: "a/2.55"
+        update_interval: "2s"
+
+      - key: "commanded_throttle_actuator"
+        unit: "%"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "4C"
+        formula: "a/2.55"
+        update_interval: "2s"
+
+      - key: "engine_oil_temp"
+        device_class: "temperature"
+        unit: "°C"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        mode: "01"
+        pid: "5C"
+        formula: "a-40"
+        update_interval: "10s"
+
+      - key: "engine_fuel_rate"
+        unit: "L/h"
+        state_class: "measurement"
+        accuracy_decimals: 2
+        mode: "01"
+        pid: "5E"
+        formula: "(a*256+b)/20"
+        update_interval: "2s"
+
+      # ----------------------------------------------------------------------
+      # Nissan RE0F10A CVT — read-only TCM Data Monitor block
+      #
+      # Source sequence: ATSH7E1 -> diagnostic session 10C0 -> Mode 21 PID 01.
+      # HassBle removes response bytes 61 01 before applying these offsets.
+      # cvt_fluid_temp is the polling leader. The other PID 01 sensors use long
+      # intervals because every 2101 response is decoded into all matching sensors.
+      # ----------------------------------------------------------------------
+      - key: "cvt_fluid_temp"
+        device_class: "temperature"
+        unit: "°C"
+        state_class: "measurement"
+        icon: "mdi:thermometer"
+        accuracy_decimals: 1
+        mode: "21"
+        pid: "01"
+        update_interval: "2s"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 29
+          length: 1
+          type: "uint8"
+          scale: 0.5555555556
+          offset_value: -6.666666667
+
+      - key: "cvt_vehicle_speed"
+        device_class: "speed"
+        unit: "km/h"
+        state_class: "measurement"
+        accuracy_decimals: 0
+        entity_category: "diagnostic"
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 10
+          length: 1
+          type: "uint8"
+
+      - key: "cvt_engine_speed"
+        unit: "rpm"
+        state_class: "measurement"
+        accuracy_decimals: 0
+        entity_category: "diagnostic"
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 5
+          length: 1
+          type: "uint8"
+          scale: 32.0
+
+      - key: "cvt_gear_ratio"
+        state_class: "measurement"
+        accuracy_decimals: 2
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 16
+          length: 1
+          type: "uint8"
+          scale: 0.01
+
+      - key: "cvt_accel_pedal"
+        unit: "%"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        entity_category: "diagnostic"
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 18
+          length: 1
+          type: "uint8"
+          scale: 0.390625
+
+      - key: "cvt_secondary_pressure"
+        device_class: "pressure"
+        unit: "MPa"
+        state_class: "measurement"
+        accuracy_decimals: 3
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 27
+          length: 1
+          type: "uint8"
+          scale: 0.025
+
+      - key: "cvt_primary_pressure"
+        device_class: "pressure"
+        unit: "MPa"
+        state_class: "measurement"
+        accuracy_decimals: 3
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 28
+          length: 1
+          type: "uint8"
+          scale: 0.025
+
+      - key: "cvt_step_motor"
+        unit: "steps"
+        state_class: "measurement"
+        accuracy_decimals: 0
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 33
+          length: 1
+          type: "uint8"
+          offset_value: -30.0
+
+      - key: "cvt_lockup_pressure"
+        device_class: "pressure"
+        unit: "MPa"
+        state_class: "measurement"
+        accuracy_decimals: 3
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 34
+          length: 1
+          type: "uint8"
+          scale: 0.025
+
+      - key: "cvt_line_pressure"
+        device_class: "pressure"
+        unit: "MPa"
+        state_class: "measurement"
+        accuracy_decimals: 3
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 35
+          length: 1
+          type: "uint8"
+          scale: 0.025
+
+      - key: "cvt_target_secondary_pressure"
+        device_class: "pressure"
+        unit: "MPa"
+        state_class: "measurement"
+        accuracy_decimals: 3
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 36
+          length: 1
+          type: "uint8"
+          scale: 0.025
+
+      - key: "cvt_selector"
+        platform: "text_sensor"
+        icon: "mdi:car-shift-pattern"
+        mode: "21"
+        pid: "01"
+        update_interval: "24h"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 52
+          length: 1
+          type: "uint8"
+          map:
+            "0": "P"
+            "9": "R"
+            "3": "N"
+            "31": "D"
+
+      - key: "cvt_deterioration"
+        unit: "points"
+        state_class: "measurement"
+        icon: "mdi:counter"
+        accuracy_decimals: 0
+        entity_category: "diagnostic"
+        mode: "21"
+        pid: "03"
+        update_interval: "10m"
+        pre_commands:
+          - "ATSH7E1"
+          - "10C0"
+        decode:
+          offset: 0
+          length: 4
+          type: "uint32"
+          endian: "big"
