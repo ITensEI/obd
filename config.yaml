@@ -398,7 +398,7 @@ devices:
         mode: "01"
         pid: "4D"
         formula: "a*256+b"
-        update_interval: "60s"
+        update_interval: "10s"
 
       - key: "z_time_since_dtc_clear"
         device_class: "duration"
@@ -409,14 +409,14 @@ devices:
         mode: "01"
         pid: "4E"
         formula: "a*256+b"
-        update_interval: "60s"
+        update_interval: "10s"
 
       - key: "z_fuel_type"
         platform: "text_sensor"
         entity_category: "diagnostic"
         mode: "01"
         pid: "51"
-        update_interval: "24h"
+        update_interval: "10s"
         decode:
           offset: 0
           length: 1
