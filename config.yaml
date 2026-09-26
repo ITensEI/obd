@@ -625,30 +625,6 @@ devices:
           type: "uint8"
           scale: 0.025
 
-      - key: "cvt_lockup_solenoid_current"
-        device_class: "current"
-        unit: "A"
-        state_class: "measurement"
-        icon: "mdi:current-dc"
-        accuracy_decimals: 3
-        entity_category: "diagnostic"
-        mode: "21"
-        pid: "01"
-        update_interval: "24h"
-        pre_commands:
-          - "ATSH7E1"
-          - "10C0"
-        # CVTz50 ISOLT1 bytes [42],[43] include the 61 01 response header.
-        # HassBle strips that header, hence offset 40 here.
-        # CVTz50 uses high*255+low; structured uint16 uses high*256+low.
-        # Observed high byte is 0..2, so this differs by at most 0.002 A here.
-        decode:
-          offset: 40
-          length: 2
-          type: "uint16"
-          endian: "big"
-          scale: 0.001
-
       - key: "cvt_brake_switch"
         platform: "binary_sensor"
         icon: "mdi:car-brake-alert"
