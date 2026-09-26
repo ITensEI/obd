@@ -627,17 +627,19 @@ devices:
           type: "uint8"
           scale: 0.025
 
-      - key: "cvt_brake_switch"
+      - key: "z_cvt_brake_switch_candidate"
         platform: "binary_sensor"
         icon: "mdi:car-brake-alert"
+        entity_category: "diagnostic"
         mode: "21"
         pid: "01"
         update_interval: "24h"
         pre_commands:
           - "ATSH7E1"
           - "10C0"
-        # Confirmed from live logs: bit 3 sets while brake is depressed,
-        # including P->D shift and parking-lot deceleration.
+        # Candidate from earlier driving correlation: bit 3 appeared to set
+        # during braking. A later rapid brake-pumping test did not capture an
+        # ON transition, so keep this as zTEST until a held-pedal test validates it.
         decode:
           offset: 53
           length: 1
