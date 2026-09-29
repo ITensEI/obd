@@ -28,59 +28,60 @@ devices:
       # ----------------------------------------------------------------------
       # Core engine / vehicle data already confirmed on this car
       # ----------------------------------------------------------------------
-      - key: "rpm"
+      - key: "Engine_RPM"
+        icon: "mdi:engine"
         unit: "rpm"
         state_class: "measurement"
-        icon: "mdi:gauge"
         accuracy_decimals: 0
         mode: "01"
         pid: "0C"
         formula: "(a*256+b)/4"
         update_interval: "1s"
 
-      - key: "speed"
+      - key: "Vehicle_Speed"
+        icon: "mdi:speedometer"
         device_class: "speed"
         unit: "km/h"
         state_class: "measurement"
-        icon: "mdi:speedometer"
         accuracy_decimals: 0
         mode: "01"
         pid: "0D"
         formula: "a"
         update_interval: "1s"
 
-      - key: "throttle"
+      - key: "Throttle_Position"
+        icon: "mdi:gauge"
         unit: "%"
         state_class: "measurement"
-        icon: "mdi:gauge"
         accuracy_decimals: 1
         mode: "01"
         pid: "11"
         formula: "a/2.55"
         update_interval: "1s"
 
-      - key: "engine_load"
+      - key: "Engine_Load"
+        icon: "mdi:engine"
         unit: "%"
         state_class: "measurement"
-        icon: "mdi:engine"
         accuracy_decimals: 1
         mode: "01"
         pid: "04"
         formula: "a/2.55"
         update_interval: "2s"
 
-      - key: "coolant_temp"
+      - key: "Engine_Coolant_Temperature"
+        icon: "mdi:coolant-temperature"
         device_class: "temperature"
         unit: "°C"
         state_class: "measurement"
-        icon: "mdi:coolant-temperature"
         accuracy_decimals: 1
         mode: "01"
         pid: "05"
         formula: "a-40"
         update_interval: "10s"
 
-      - key: "intake_air_temp"
+      - key: "Engine_Intake_Air_Temperature"
+        icon: "mdi:thermometer"
         device_class: "temperature"
         unit: "°C"
         state_class: "measurement"
@@ -90,17 +91,18 @@ devices:
         formula: "a-40"
         update_interval: "10s"
 
-      - key: "fuel_level"
+      - key: "Fuel_Level"
+        icon: "mdi:gas-station"
         unit: "%"
         state_class: "measurement"
-        icon: "mdi:gas-station"
         accuracy_decimals: 1
         mode: "01"
         pid: "2F"
         formula: "a/2.55"
         update_interval: "30s"
 
-      - key: "run_time"
+      - key: "Engine_Run_Time"
+        icon: "mdi:timer-outline"
         device_class: "duration"
         unit: "s"
         state_class: "measurement"
@@ -116,9 +118,10 @@ devices:
       # 010A, 010B, 0114, 0134, 015C, 015E.
       # PID 0115 voltage is supported; its trim byte is FF (trim not used).
       # ----------------------------------------------------------------------
-      - key: "mil_status"
+      - key: "MIL_Status"
         platform: "binary_sensor"
-        icon: "mdi:engine-alert"
+        icon: "mdi:engine"
+        entity_category: "diagnostic"
         mode: "01"
         pid: "01"
         update_interval: "10s"
@@ -131,7 +134,8 @@ devices:
             "0": "off"
             "128": "on"
 
-      - key: "stored_dtc_count"
+      - key: "DTC_Stored_Count"
+        icon: "mdi:alert-circle-outline"
         entity_category: "diagnostic"
         accuracy_decimals: 0
         mode: "01"
@@ -143,7 +147,9 @@ devices:
           type: "uint8"
           bitmask: 127
 
-      - key: "short_fuel_trim_b1"
+      - key: "Fuel_Trim_Short_B1"
+        icon: "mdi:tune-variant"
+        entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
         accuracy_decimals: 1
@@ -152,7 +158,9 @@ devices:
         formula: "(a-128)*100/128"
         update_interval: "2s"
 
-      - key: "long_fuel_trim_b1"
+      - key: "Fuel_Trim_Long_B1"
+        icon: "mdi:tune-variant"
+        entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
         accuracy_decimals: 1
@@ -161,7 +169,9 @@ devices:
         formula: "(a-128)*100/128"
         update_interval: "5s"
 
-      - key: "timing_advance"
+      - key: "Engine_Timing_Advance"
+        icon: "mdi:engine"
+        entity_category: "diagnostic"
         unit: "°"
         state_class: "measurement"
         accuracy_decimals: 1
@@ -170,17 +180,19 @@ devices:
         formula: "a/2-64"
         update_interval: "2s"
 
-      - key: "maf"
+      - key: "MAF_Flow"
+        icon: "mdi:air-filter"
         unit: "g/s"
         state_class: "measurement"
-        icon: "mdi:air-filter"
         accuracy_decimals: 2
         mode: "01"
         pid: "10"
         formula: "(a*256+b)/100"
         update_interval: "2s"
 
-      - key: "o2_b1s2_voltage"
+      - key: "O2_B1S2_Voltage"
+        icon: "mdi:molecule"
+        entity_category: "diagnostic"
         device_class: "voltage"
         unit: "V"
         state_class: "measurement"
@@ -190,7 +202,9 @@ devices:
         formula: "a/200"
         update_interval: "5s"
 
-      - key: "distance_with_mil"
+      - key: "MIL_Distance"
+        icon: "mdi:map-marker-distance"
+        entity_category: "diagnostic"
         device_class: "distance"
         unit: "km"
         state_class: "measurement"
@@ -200,7 +214,9 @@ devices:
         formula: "a*256+b"
         update_interval: "60s"
 
-      - key: "commanded_evap_purge"
+      - key: "EVAP_Commanded_Purge"
+        icon: "mdi:air-filter"
+        entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
         accuracy_decimals: 1
@@ -209,28 +225,32 @@ devices:
         formula: "a/2.55"
         update_interval: "5s"
 
-      - key: "warmups_since_clear"
+      - key: "DTC_Warmups_Since_Clear"
+        icon: "mdi:engine"
+        entity_category: "diagnostic"
         unit: "cycles"
         state_class: "measurement"
         accuracy_decimals: 0
-        entity_category: "diagnostic"
         mode: "01"
         pid: "30"
         formula: "a"
         update_interval: "60s"
 
-      - key: "distance_since_clear"
+      - key: "DTC_Distance_Since_Clear"
+        icon: "mdi:map-marker-distance"
+        entity_category: "diagnostic"
         device_class: "distance"
         unit: "km"
         state_class: "measurement"
         accuracy_decimals: 0
-        entity_category: "diagnostic"
         mode: "01"
         pid: "31"
         formula: "a*256+b"
         update_interval: "60s"
 
-      - key: "evap_vapor_pressure"
+      - key: "EVAP_Vapor_Pressure"
+        icon: "mdi:gauge"
+        entity_category: "diagnostic"
         device_class: "pressure"
         unit: "Pa"
         state_class: "measurement"
@@ -245,7 +265,9 @@ devices:
           endian: "big"
           scale: 0.25
 
-      - key: "barometric_pressure"
+      - key: "Engine_Barometric_Pressure"
+        icon: "mdi:gauge"
+        entity_category: "diagnostic"
         device_class: "pressure"
         unit: "kPa"
         state_class: "measurement"
@@ -255,7 +277,9 @@ devices:
         formula: "a"
         update_interval: "30s"
 
-      - key: "catalyst_temp_b1s1"
+      - key: "Catalyst_B1S1_Temperature"
+        icon: "mdi:thermometer"
+        entity_category: "diagnostic"
         device_class: "temperature"
         unit: "°C"
         state_class: "measurement"
@@ -265,7 +289,8 @@ devices:
         formula: "(a*256+b)/10-40"
         update_interval: "10s"
 
-      - key: "battery_voltage"
+      - key: "Vehicle_Battery_Voltage"
+        icon: "mdi:car-battery"
         device_class: "voltage"
         unit: "V"
         state_class: "measurement"
@@ -275,7 +300,9 @@ devices:
         formula: "(a*256+b)/1000"
         update_interval: "10s"
 
-      - key: "absolute_load"
+      - key: "Engine_Absolute_Load"
+        icon: "mdi:engine"
+        entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
         accuracy_decimals: 1
@@ -284,7 +311,9 @@ devices:
         formula: "(a*256+b)*100/255"
         update_interval: "2s"
 
-      - key: "commanded_equivalence_ratio"
+      - key: "Fuel_Commanded_Equivalence_Ratio"
+        icon: "mdi:lambda"
+        entity_category: "diagnostic"
         unit: "λ"
         state_class: "measurement"
         accuracy_decimals: 3
@@ -293,7 +322,9 @@ devices:
         formula: "(a*256+b)/32768"
         update_interval: "2s"
 
-      - key: "relative_throttle"
+      - key: "Throttle_Relative_Position"
+        icon: "mdi:gauge"
+        entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
         accuracy_decimals: 1
@@ -302,7 +333,8 @@ devices:
         formula: "a/2.55"
         update_interval: "2s"
 
-      - key: "accelerator_position_d"
+      - key: "Accelerator_Position_D"
+        icon: "mdi:gauge"
         unit: "%"
         state_class: "measurement"
         accuracy_decimals: 1
@@ -311,7 +343,9 @@ devices:
         formula: "a/2.55"
         update_interval: "2s"
 
-      - key: "commanded_throttle_actuator"
+      - key: "Throttle_Commanded_Actuator"
+        icon: "mdi:gauge"
+        entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
         accuracy_decimals: 1
@@ -331,8 +365,9 @@ devices:
       #
       # 0103, 0124, 0147, 014A, 014D, 014E and 0151 were confirmed with live responses.
       # ----------------------------------------------------------------------
-      - key: "fuel_system_status"
+      - key: "Fuel_System_Status"
         platform: "text_sensor"
+        icon: "mdi:gas-station"
         entity_category: "diagnostic"
         mode: "01"
         pid: "03"
@@ -349,7 +384,9 @@ devices:
             "8": "Open loop - system failure"
             "16": "Closed loop - fault"
 
-      - key: "o2_b1s1_equivalence_ratio"
+      - key: "O2_B1S1_Equivalence_Ratio"
+        icon: "mdi:lambda"
+        entity_category: "diagnostic"
         unit: "λ"
         state_class: "measurement"
         accuracy_decimals: 3
@@ -358,7 +395,9 @@ devices:
         formula: "(a*256+b)/32768"
         update_interval: "5s"
 
-      - key: "o2_b1s1_voltage"
+      - key: "O2_B1S1_Voltage"
+        icon: "mdi:molecule"
+        entity_category: "diagnostic"
         device_class: "voltage"
         unit: "V"
         state_class: "measurement"
@@ -368,7 +407,8 @@ devices:
         formula: "(c*256+d)/8192"
         update_interval: "24h"
 
-      - key: "throttle_position_b"
+      - key: "Throttle_Position_B"
+        icon: "mdi:gauge"
         entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
@@ -378,7 +418,8 @@ devices:
         formula: "a/2.55"
         update_interval: "5s"
 
-      - key: "accelerator_position_e"
+      - key: "Accelerator_Position_E"
+        icon: "mdi:gauge"
         entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
@@ -388,30 +429,33 @@ devices:
         formula: "a/2.55"
         update_interval: "5s"
 
-      - key: "time_with_mil"
+      - key: "MIL_Time"
+        icon: "mdi:timer-outline"
+        entity_category: "diagnostic"
         device_class: "duration"
         unit: "min"
         state_class: "measurement"
         accuracy_decimals: 0
-        entity_category: "diagnostic"
         mode: "01"
         pid: "4D"
         formula: "a*256+b"
         update_interval: "60s"
 
-      - key: "time_since_dtc_clear"
+      - key: "DTC_Time_Since_Clear"
+        icon: "mdi:timer-outline"
+        entity_category: "diagnostic"
         device_class: "duration"
         unit: "min"
         state_class: "measurement"
         accuracy_decimals: 0
-        entity_category: "diagnostic"
         mode: "01"
         pid: "4E"
         formula: "a*256+b"
         update_interval: "60s"
 
-      - key: "fuel_type"
+      - key: "Fuel_Type"
         platform: "text_sensor"
+        icon: "mdi:gas-station"
         entity_category: "diagnostic"
         mode: "01"
         pid: "51"
@@ -436,14 +480,14 @@ devices:
       #
       # Source sequence: ATSH7E1 -> diagnostic session 10C0 -> Mode 21 PID 01.
       # HassBle removes response bytes 61 01 before applying these offsets.
-      # cvt_fluid_temp is the polling leader. The other PID 01 sensors use long
+      # CVT_Fluid_Temperature is the polling leader. The other PID 01 sensors use long
       # intervals because every 2101 response is decoded into all matching sensors.
       # ----------------------------------------------------------------------
-      - key: "cvt_fluid_temp"
+      - key: "CVT_Fluid_Temperature"
+        icon: "mdi:thermometer"
         device_class: "temperature"
         unit: "°C"
         state_class: "measurement"
-        icon: "mdi:thermometer"
         accuracy_decimals: 1
         mode: "21"
         pid: "01"
@@ -458,12 +502,13 @@ devices:
           scale: 0.5555555556
           offset_value: -6.666666667
 
-      - key: "cvt_vehicle_speed"
+      - key: "CVT_Vehicle_Speed"
+        icon: "mdi:speedometer"
+        entity_category: "diagnostic"
         device_class: "speed"
         unit: "km/h"
         state_class: "measurement"
         accuracy_decimals: 0
-        entity_category: "diagnostic"
         mode: "21"
         pid: "01"
         update_interval: "24h"
@@ -475,11 +520,12 @@ devices:
           length: 1
           type: "uint8"
 
-      - key: "cvt_engine_speed"
+      - key: "CVT_Engine_Speed"
+        icon: "mdi:engine"
+        entity_category: "diagnostic"
         unit: "rpm"
         state_class: "measurement"
         accuracy_decimals: 0
-        entity_category: "diagnostic"
         mode: "21"
         pid: "01"
         update_interval: "24h"
@@ -492,7 +538,8 @@ devices:
           type: "uint8"
           scale: 32.0
 
-      - key: "cvt_gear_ratio"
+      - key: "CVT_Gear_Ratio"
+        icon: "mdi:car-shift-pattern"
         unit: ":1"
         state_class: "measurement"
         accuracy_decimals: 2
@@ -508,11 +555,12 @@ devices:
           type: "uint8"
           scale: 0.01
 
-      - key: "cvt_accel_pedal"
+      - key: "CVT_Accelerator_Position"
+        icon: "mdi:gauge"
+        entity_category: "diagnostic"
         unit: "%"
         state_class: "measurement"
         accuracy_decimals: 1
-        entity_category: "diagnostic"
         mode: "21"
         pid: "01"
         update_interval: "24h"
@@ -525,7 +573,9 @@ devices:
           type: "uint8"
           scale: 0.390625
 
-      - key: "cvt_secondary_pressure"
+      - key: "CVT_Secondary_Pressure"
+        icon: "mdi:gauge"
+        entity_category: "diagnostic"
         device_class: "pressure"
         unit: "MPa"
         state_class: "measurement"
@@ -542,7 +592,9 @@ devices:
           type: "uint8"
           scale: 0.025
 
-      - key: "cvt_primary_pressure"
+      - key: "CVT_Primary_Pressure"
+        icon: "mdi:gauge"
+        entity_category: "diagnostic"
         device_class: "pressure"
         unit: "MPa"
         state_class: "measurement"
@@ -559,7 +611,9 @@ devices:
           type: "uint8"
           scale: 0.025
 
-      - key: "cvt_step_motor"
+      - key: "CVT_Step_Motor"
+        icon: "mdi:cog-outline"
+        entity_category: "diagnostic"
         unit: "steps"
         state_class: "measurement"
         accuracy_decimals: 0
@@ -575,7 +629,9 @@ devices:
           type: "uint8"
           offset_value: -30.0
 
-      - key: "cvt_lockup_pressure"
+      - key: "CVT_Lockup_Pressure"
+        icon: "mdi:gauge"
+        entity_category: "diagnostic"
         device_class: "pressure"
         unit: "MPa"
         state_class: "measurement"
@@ -592,7 +648,9 @@ devices:
           type: "uint8"
           scale: 0.025
 
-      - key: "cvt_line_pressure"
+      - key: "CVT_Line_Pressure"
+        icon: "mdi:gauge"
+        entity_category: "diagnostic"
         device_class: "pressure"
         unit: "MPa"
         state_class: "measurement"
@@ -609,7 +667,9 @@ devices:
           type: "uint8"
           scale: 0.025
 
-      - key: "cvt_target_secondary_pressure"
+      - key: "CVT_Target_Secondary_Pressure"
+        icon: "mdi:gauge"
+        entity_category: "diagnostic"
         device_class: "pressure"
         unit: "MPa"
         state_class: "measurement"
@@ -626,7 +686,7 @@ devices:
           type: "uint8"
           scale: 0.025
 
-      - key: "cvt_brake_switch"
+      - key: "CVT_Brake_Switch"
         platform: "binary_sensor"
         icon: "mdi:car-brake-alert"
         entity_category: "diagnostic"
@@ -647,9 +707,9 @@ devices:
             "0": "off"
             "8": "on"
 
-      - key: "cvt_idle_switch"
+      - key: "CVT_Idle_Switch"
         platform: "binary_sensor"
-        icon: "mdi:pedal-accelerator"
+        icon: "mdi:engine"
         entity_category: "diagnostic"
         mode: "21"
         pid: "01"
@@ -668,7 +728,7 @@ devices:
             "0": "off"
             "1": "on"
 
-      - key: "cvt_selector"
+      - key: "CVT_Selector"
         platform: "text_sensor"
         icon: "mdi:car-shift-pattern"
         mode: "21"
@@ -688,12 +748,12 @@ devices:
             "31": "D"
             "22": "L"
 
-      - key: "cvt_deterioration"
+      - key: "CVT_Deterioration"
+        icon: "mdi:counter"
+        entity_category: "diagnostic"
         unit: "points"
         state_class: "measurement"
-        icon: "mdi:counter"
         accuracy_decimals: 0
-        entity_category: "diagnostic"
         mode: "21"
         pid: "03"
         update_interval: "10m"
