@@ -337,9 +337,9 @@ devices:
         icon: "mdi:gauge"
         entity_category: "diagnostic"
         device_class: "pressure"
-        unit: "MPa"
+        unit: "kPa"
         state_class: "measurement"
-        accuracy_decimals: 3
+        accuracy_decimals: 0
         mode: "21"
         pid: "01"
         update_interval: "24h"
@@ -350,15 +350,15 @@ devices:
           offset: 35
           length: 1
           type: "uint8"
-          scale: 0.025
+          scale: 25.0
 
       - key: "CVT_Lockup_Pressure"
         icon: "mdi:gauge"
         entity_category: "diagnostic"
         device_class: "pressure"
-        unit: "MPa"
+        unit: "kPa"
         state_class: "measurement"
-        accuracy_decimals: 3
+        accuracy_decimals: 0
         mode: "21"
         pid: "01"
         update_interval: "24h"
@@ -369,15 +369,15 @@ devices:
           offset: 34
           length: 1
           type: "uint8"
-          scale: 0.025
+          scale: 25.0
 
       - key: "CVT_Primary_Pressure"
         icon: "mdi:gauge"
         entity_category: "diagnostic"
         device_class: "pressure"
-        unit: "MPa"
+        unit: "kPa"
         state_class: "measurement"
-        accuracy_decimals: 3
+        accuracy_decimals: 0
         mode: "21"
         pid: "01"
         update_interval: "24h"
@@ -388,15 +388,15 @@ devices:
           offset: 28
           length: 1
           type: "uint8"
-          scale: 0.025
+          scale: 25.0
 
       - key: "CVT_Secondary_Pressure"
         icon: "mdi:gauge"
         entity_category: "diagnostic"
         device_class: "pressure"
-        unit: "MPa"
+        unit: "kPa"
         state_class: "measurement"
-        accuracy_decimals: 3
+        accuracy_decimals: 0
         mode: "21"
         pid: "01"
         update_interval: "24h"
@@ -407,7 +407,7 @@ devices:
           offset: 27
           length: 1
           type: "uint8"
-          scale: 0.025
+          scale: 25.0
 
       - key: "CVT_Step_Motor"
         icon: "mdi:cog-outline"
@@ -431,9 +431,9 @@ devices:
         icon: "mdi:gauge"
         entity_category: "diagnostic"
         device_class: "pressure"
-        unit: "MPa"
+        unit: "kPa"
         state_class: "measurement"
-        accuracy_decimals: 3
+        accuracy_decimals: 0
         mode: "21"
         pid: "01"
         update_interval: "24h"
@@ -444,7 +444,7 @@ devices:
           offset: 36
           length: 1
           type: "uint8"
-          scale: 0.025
+          scale: 25.0
 
       - key: "CVT_Vehicle_Speed"
         icon: "mdi:speedometer"
